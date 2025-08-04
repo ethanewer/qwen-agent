@@ -158,10 +158,11 @@ export async function runNonInteractive(
           } else {
             const resultDisplay = toolResponse.resultDisplay;
             if (resultDisplay) {
-              const resultOutput =
+              const resultOutput = (
                 typeof resultDisplay === 'string'
                   ? resultDisplay
-                  : resultDisplay.fileDiff;
+                  : resultDisplay.fileDiff
+              ).trim();
 
               console.log(
                 resultOutput.length > 64
