@@ -102,6 +102,14 @@ export async function runNonInteractive(
         }
         if (resp.functionCalls) {
           functionCalls.push(...resp.functionCalls);
+          for (let functionCall of resp.functionCalls) {
+            console.log('<tool_call>');
+            console.log({
+              name: functionCall.name,
+              args: functionCall.args,
+            });
+            console.log('</tool_call>');
+          }
         }
       }
 
@@ -134,6 +142,17 @@ export async function runNonInteractive(
             );
             if (!isToolNotFound) {
               process.exit(1);
+            }
+          } else {
+            const resultDisplay = toolResponse.resultDisplay;
+            if (resultDisplay) {
+              console.log('<tool_response>');
+              console.log(
+                typeof resultDisplay === 'string'
+                  ? resultDisplay
+                  : resultDisplay.fileDiff,
+              );
+              console.log('</tool_response>\n');
             }
           }
 
