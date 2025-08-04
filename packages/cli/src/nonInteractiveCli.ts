@@ -20,6 +20,7 @@ import {
 } from '@google/genai';
 
 import { parseAndFormatApiError } from './ui/utils/errorParsing.js';
+import { stdout } from 'process';
 
 function getResponseText(response: GenerateContentResponse): string | null {
   if (response.candidates && response.candidates.length > 0) {
@@ -101,7 +102,7 @@ export async function runNonInteractive(
         }
         const textPart = getResponseText(resp);
         if (textPart) {
-          console.log(textPart);
+          stdout.write(textPart);
         }
         if (resp.functionCalls) {
           functionCalls.push(...resp.functionCalls);
