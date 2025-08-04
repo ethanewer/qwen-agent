@@ -106,12 +106,12 @@ export async function runNonInteractive(
         if (resp.functionCalls) {
           functionCalls.push(...resp.functionCalls);
           for (let functionCall of resp.functionCalls) {
-            console.log(
-              `<tool_call>\n${{
-                name: functionCall.name,
-                args: functionCall.args,
-              }}\n</tool_call>\n`,
-            );
+            console.log('<tool_call>');
+            console.log({
+              name: functionCall.name,
+              args: functionCall.args,
+            });
+            console.log('</tool_call>');
           }
         }
 
