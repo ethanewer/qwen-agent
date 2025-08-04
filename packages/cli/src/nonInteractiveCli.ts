@@ -64,6 +64,7 @@ export async function runNonInteractive(
   const abortController = new AbortController();
   let currentMessages: Content[] = [{ role: 'user', parts: [{ text: input }] }];
   let turnCount = 0;
+  let totalTokenCount = 0;
   try {
     while (true) {
       turnCount++;
@@ -84,7 +85,9 @@ export async function runNonInteractive(
           config: {
             abortSignal: abortController.signal,
             tools: [
-              { functionDeclarations: toolRegistry.getFunctionDeclarations() },
+              {
+                functionDeclarations: toolRegistry.getFunctionDeclarations(),
+              },
             ],
           },
         },
@@ -103,13 +106,21 @@ export async function runNonInteractive(
         if (resp.functionCalls) {
           functionCalls.push(...resp.functionCalls);
           for (let functionCall of resp.functionCalls) {
-            console.log('<tool_call>');
-            console.log({
-              name: functionCall.name,
-              args: functionCall.args,
-            });
-            console.log('</tool_call>');
+            process.stdout.write(
+              `<tool_call>\n${{
+                name: functionCall.name,
+                args: functionCall.args,
+              }}\n</tool_call>\n`,
+            );
           }
+        }
+
+        if (
+          resp.usageMetadata &&
+          resp.usageMetadata.totalTokenCount &&
+          resp.usageMetadata.totalTokenCount > totalTokenCount
+        ) {
+          totalTokenCount = resp.usageMetadata.totalTokenCount;
         }
       }
 
@@ -146,13 +157,16 @@ export async function runNonInteractive(
           } else {
             const resultDisplay = toolResponse.resultDisplay;
             if (resultDisplay) {
-              console.log('<tool_response>');
-              console.log(
+              const resultOutput =
                 typeof resultDisplay === 'string'
                   ? resultDisplay
-                  : resultDisplay.fileDiff,
+                  : resultDisplay.fileDiff;
+
+              process.stdout.write(
+                resultOutput.length > 64
+                  ? `</tool_response>\n${resultOutput}\n</tool_response>\n`
+                  : `</tool_response>${resultOutput}</tool_response>\n`,
               );
-              console.log('</tool_response>\n');
             }
           }
 
@@ -171,7 +185,7 @@ export async function runNonInteractive(
         }
         currentMessages = [{ role: 'user', parts: toolResponseParts }];
       } else {
-        process.stdout.write('\n'); // Ensure a final newline
+        process.stdout.write(`\n${totalTokenCount} tokens used.\n`);
         return;
       }
     }
