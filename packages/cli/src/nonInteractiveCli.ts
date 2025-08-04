@@ -101,12 +101,12 @@ export async function runNonInteractive(
         }
         const textPart = getResponseText(resp);
         if (textPart) {
-          process.stdout.write(textPart);
+          console.log(textPart);
         }
         if (resp.functionCalls) {
           functionCalls.push(...resp.functionCalls);
           for (let functionCall of resp.functionCalls) {
-            process.stdout.write(
+            console.log(
               `<tool_call>\n${{
                 name: functionCall.name,
                 args: functionCall.args,
@@ -162,7 +162,7 @@ export async function runNonInteractive(
                   ? resultDisplay
                   : resultDisplay.fileDiff;
 
-              process.stdout.write(
+              console.log(
                 resultOutput.length > 64
                   ? `</tool_response>\n${resultOutput}\n</tool_response>\n`
                   : `</tool_response>${resultOutput}</tool_response>\n`,
@@ -185,7 +185,7 @@ export async function runNonInteractive(
         }
         currentMessages = [{ role: 'user', parts: toolResponseParts }];
       } else {
-        process.stdout.write(`\n${totalTokenCount} tokens used.\n`);
+        console.log(`\n${totalTokenCount} tokens used.\n`);
         return;
       }
     }
