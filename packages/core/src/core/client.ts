@@ -115,6 +115,10 @@ export class GeminiClient {
 
     this.embeddingModel = config.getEmbeddingModel();
     this.loopDetector = new LoopDetectionService(config);
+
+    if (config.getModel() === 'gpt-5') {
+      this.generateContentConfig.temperature = 1.0;
+    }
   }
 
   async initialize(contentGeneratorConfig: ContentGeneratorConfig) {
