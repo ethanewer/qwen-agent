@@ -60,6 +60,10 @@ export async function runNonInteractive(
 
   const geminiClient = config.getGeminiClient();
   const toolRegistry: ToolRegistry = await config.getToolRegistry();
+  console.log(
+    'All tools:',
+    toolRegistry.getAllTools().map((tool) => tool.name),
+  );
 
   const chat = await geminiClient.getChat();
   const abortController = new AbortController();
@@ -108,10 +112,8 @@ export async function runNonInteractive(
           functionCalls.push(...resp.functionCalls);
           for (let functionCall of resp.functionCalls) {
             console.log('<tool_call>');
-            console.log({
-              name: functionCall.name,
-              args: functionCall.args,
-            });
+            console.log('name:', functionCall.name);
+            console.log('args:', functionCall.args);
             console.log('</tool_call>');
           }
         }
@@ -166,8 +168,8 @@ export async function runNonInteractive(
 
               console.log(
                 resultOutput.length > 64
-                  ? `</tool_response>\n${resultOutput}\n</tool_response>\n`
-                  : `</tool_response>${resultOutput}</tool_response>\n`,
+                  ? `</tool_response>\n${resultOutput}\n</tool_response>`
+                  : `</tool_response>${resultOutput}</tool_response>`,
               );
             }
           }

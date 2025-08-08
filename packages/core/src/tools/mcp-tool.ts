@@ -67,7 +67,8 @@ export class DiscoveredMCPTool extends BaseTool<ToolParams, ToolResult> {
     return {
       name: this.name,
       description: this.description,
-      parametersJsonSchema: this.parameterSchemaJson,
+      // @ts-ignore
+      parameters: this.parameterSchemaJson,
     };
   }
 
