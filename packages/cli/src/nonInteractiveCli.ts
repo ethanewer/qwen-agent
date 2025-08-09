@@ -168,8 +168,8 @@ export async function runNonInteractive(
 
               console.log(
                 resultOutput.length > 64
-                  ? `</tool_response>\n${resultOutput}\n</tool_response>`
-                  : `</tool_response>${resultOutput}</tool_response>`,
+                  ? `<tool_response>\n${resultOutput}\n</tool_response>`
+                  : `<tool_response>${resultOutput}</tool_response>`,
               );
             }
           }
