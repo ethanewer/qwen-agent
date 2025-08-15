@@ -43,6 +43,11 @@ export async function runNonInteractive(
     const geminiClient = config.getGeminiClient();
     const toolRegistry: ToolRegistry = await config.getToolRegistry();
 
+    console.log(
+      'All tools:',
+      toolRegistry.getAllTools().map((tool) => tool.name),
+    );
+
     const abortController = new AbortController();
     let currentMessages: Content[] = [
       { role: 'user', parts: [{ text: input }] },
@@ -83,6 +88,10 @@ export async function runNonInteractive(
             id: toolCallRequest.callId,
           };
           functionCalls.push(fc);
+          console.log('<tool_call>');
+          console.log('name:', fc.name);
+          console.log('args:', fc.args);
+          console.log('</tool_call>');
         }
       }
 
@@ -112,6 +121,21 @@ export async function runNonInteractive(
             );
             if (toolResponse.errorType === ToolErrorType.UNHANDLED_EXCEPTION)
               process.exit(1);
+          }
+
+          const resultDisplay = toolResponse.resultDisplay;
+          if (resultDisplay) {
+            const resultOutput = (
+              typeof resultDisplay === 'string'
+                ? resultDisplay
+                : resultDisplay.fileDiff
+            ).trim();
+
+            console.log(
+              resultOutput.length > 64
+                ? `<tool_response>\n${resultOutput}\n</tool_response>`
+                : `<tool_response>${resultOutput}</tool_response>`,
+            );
           }
 
           if (toolResponse.responseParts) {
